@@ -24,4 +24,4 @@
   echo empty($d); // $d = 1 => FALSE
   echo empty($e); // $e = "" => TRUE
   echo empty($f); // $f = "abc" => FALSE
-  ```
+```
