@@ -81,3 +81,52 @@ if ( verify === true ) {
 }
 ```
 #### 然後使用者登入時帶上這個 Cookie Value 時，則將該值與我們資料表中該會員擁有的唯一 ID 作比對
+***
+***
+***
+***
+***
+### php 引擎有內建語法可以幫我們實現這個機制，所以其實我們不用建立資料庫，也可以存放通行證資料
+
+### 這個語法就是 session_start()，若要使用，必須放在網頁最上方，或者還沒有任何輸出之前
+```html
+if ( verify === true ) {
+    session_start(); // 啟動 Session
+    $_SESSION['member'] = true; // 註冊登入者為會員並且使其為 true
+    $_SESSION['id_number'] = $row['id_number']; // 註冊登入成功的會員帳號與暱稱
+    $_SESSION['nickname'] = $row['nickname'];
+    echo "<script>alert('登入成功 !');parent.location.href='../index.php';</script>";
+}
+```
+#### 當 session_start() 被執行時，會正式啟動內建 Session 機制，並且自動發送一個名為 PHPSESSION 的 Cookie 給使用者
+
+#### 這個名為 PHPSESSION 的 Cookie，其 Value 是一組隨機亂數產生的亂碼，這一點就與我們先前使用 uniqid() 的方法不謀而合
+
+#### PHPSESSION 是該 Cookie 的預設名稱，可以於伺服器這邊更改
+
+#### 另外，我可以使用 $_SESSION 建立屬於這組 Session 的相關資料，如該使用者的帳號與暱稱等等，都可以自定義儲存在後端數據中
+### 那要如何驗證呢 ? 這邊同樣要先使用 session_start()
+```html
+isLogin = false; // 先宣告是好習慣，避免全局變數汙染
+
+session_start();
+  if (isset($_SESSION['member']) && $_SESSION['member'] === true) {
+    isLogin = true;　// 成功登入狀態
+  } else {
+    isLogin = false; // 非登入狀態
+  }
+echo json_encode($arr);
+```
+### 那要如何登出呢 ?
+
+### 只要在後端這邊銷毀這個通行證即可，也就是銷毀這個 Session，下列兩種方法都可以
+```html
+// 刪除 Session 變量
+unset($_SESSION['member'])
+
+// 刪除整份的 Session
+session_destroy();
+```
+#### 這邊就是銷毀通行證的方法，下次用戶再輸入帳密登入時再發新的給他就好
+
+#### 另外就是 Session 也可以設置存在時間，這樣可以更完善通行機制，這邊就不多做說明了
