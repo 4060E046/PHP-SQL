@@ -18,3 +18,43 @@
 ##### 第三點 : 如同你造訪大樓一樣，離開時要換證，要把通行證還給警衛室，如此你就與這張通行證沒有關係了。
 
 ***
+#### 要加入我們留言板網站的會員驗證，該怎麼做呢？
+
+#### 核心關鍵「通行證」該如何實現？
+#### 將這個「通行證」用 Cookie 機制來實現，只要每次連線都可以帶上可以驗證我們身分的 Cookie，那我就不必每次都要輸入帳號密碼登入了。
+
+#### 而由於「通行證」是大樓本身－也就是後端要發給我的，所以當我第一次登入Success的時候，後端若要發給我這張通行證 Cookie，需要使用以下語法：
+```html
+if ( verify === true ) {
+ echo "登入Success ! ";
+ setcookie("member_id", "001", time()+3600*24); //setcookit(name,value,有效時間)
+}
+```
+#### 使用 setcookie 這個語法，我發送了一個名為 member_id 的 Cookie 給使用者，而這個 Cookie 過了 24 小時之後便會自動銷毀。
+
+#### 而在驗證上，我做了一個最簡單的驗證，只要你名為 member_id 的 Cookie 值不為空，我就當作你擁有通行證，有通行資格
+```html
+// 使用者連線到網站
+
+require_once('./conn.php');
+
+if(!isset($_COOKIE["member_id"])) { 
+ echo "目前是登出狀態";
+} else {
+ echo "目前是登入狀態";
+}
+```
+### $_COOKIE["member_id"] 可讓後端接收名為 member_id 的 Cookie 的值，這邊可以看到我的驗證條件設定為「裡面有值」就能通過
+
+### 這樣當然是非常非常非常非常不安全的，前面有提過，Cookie 是可以由使用者自己創造與修改的，所以我只要在瀏覽的時候自行創造一個名為 member_id 的 Cookie，然後在 Value 裡面打幾個字，我就可以登入Success了
+
+***
+
+### 「登出」功能
+#### 當你按下登出時，發送一個同樣名為 member_id 但值為空的 Cookie，基於 Cookie 同名會覆蓋的特性，這份值為空的 Cookie 會覆蓋會員原先的那份 Cookie，如此等同於你擁有的 Cookie 無效
+```html
+// 按下登出之後
+
+setcookie("member_id", "", time()+3600*24); // 雖然是賦予""，但其實是空值，而非空字串
+header("Location: ./index.php");
+```
