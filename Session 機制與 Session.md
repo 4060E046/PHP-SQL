@@ -61,3 +61,23 @@ if(!isset($_COOKIE["member_id"])) {
 setcookie("member_id", "", time()+3600*24); // 雖然是賦予""，但其實是空值，而非空字串
 header("Location: ./index.php");
 ```
+
+***
+***
+***
+***
+***
+
+## 更進一步的 Session 機制
+#### 上面方法我們給予使用者 Cookie，讓使用者下次瀏覽網頁時自動帶上這個 Cookie 讓後端作驗證，但驗證的方法太糟糕，非常不安全，因為當時我們採用的是只要該 Cookie 內的 Value 不為空就能算是登入狀態
+#### 所以這一週我們要發送一組 Cookie 驗證碼給使用者，讓使用者帶上這份驗證碼讓後端進行驗證，若驗證Success，則為登入狀態
+### 建議可以使用 uniqid() 這個函數生成一個唯一 ID，夾在 Cookie 內給使用者，並同時將這個唯一 ID 存入一個我們新創的資料表中
+
+```
+if ( verify === true ) {
+    echo "登入Success ! ";
+    $uniqid = uniqid();
+    setcookit("member_id", $uniqid, time()+3600*24);
+}
+```
+#### 然後使用者登入時帶上這個 Cookie Value 時，則將該值與我們資料表中該會員擁有的唯一 ID 作比對
